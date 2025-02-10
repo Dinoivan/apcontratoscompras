@@ -1,0 +1,358 @@
+<mvc:View controllerName="apcontratoscompras.controller.View1" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:form="sap.ui.layout.form" xmlns:f="sap.ui.layout.form" xmlns:layout="sap.ui.layout">
+    <SplitApp id="SplitApp">
+        <masterPages>
+            <Page id="page" title="{i18n>view.Master.title} {= ${path: '/WorkflowTaskCollection'}.length}">
+                <content>
+                    <List id="list" mode="MultiSelect"
+                        includeItemInSelection="false"
+                        selectionChange="fireSelectionChange"
+                        items="{
+                            path: '/WorkflowTaskCollection',
+                            parameters: {
+                                $skip: '0',
+                                $top: '1000000',
+                                $inlinecount: 'allpages'
+                            }
+                        }">
+                        <ObjectListItem id="MAIN_LIST_ITEM"
+                                        type="Active"
+                                        press="_handleItemPress"
+                                        title="{PoNumber} {SupplierName}"
+                                        number="{path: 'Value', formatter: '.formatMoney'}"
+                                        numberUnit="{Currency}">
+                            <firstStatus>
+                                <ObjectStatus id="ListStatusWiCreatedAt"
+                                            text="{path: 'WiCreatedAt', formatter: '.formatFechaUTC'}"/>
+                            </firstStatus>
+                            <attributes>
+                                <ObjectAttribute id="ListAttributeItemDescription" text="{ItemDescriptions}"/>
+                                <ObjectAttribute id="ListAttributeCreatedByName" text="{CreatedByName}"/>
+                                <ObjectAttribute id="ListAttributeForwardedByName"
+                                                text="{ForwardedByName}"
+                                                />
+                                <ObjectAttribute id="ListAttributeSubstitutingForName"
+                                                text="{SubstitutingForName}"
+                                                />
+                                <ObjectAttribute id="idObjectAttribute" text=""/>
+                                <ObjectAttribute id="idObjectAttribute2" text="{texto2}"/>
+                                <ObjectAttribute id="idObjectAttribute3" text="{texto3}"/>
+                                <ObjectAttribute id="idObjectAttribute4" text=""/>
+                            </attributes>
+                            <!-- @ExtensionPoint extListItemInfo: document list (S2 view) -->
+                            <core:ExtensionPoint name="extListItemInfo"/>
+                        </ObjectListItem>
+                    </List>
+                </content>
+                <footer>
+                    <Bar id="footer"></Bar>
+                </footer>
+            </Page>
+        </masterPages>
+        <detailPages>
+            <Page id="WIDetail" title="{i18n>view.PurchaseContract.title}" class="sapUiFioriObjectPage">
+                <content>
+                    <!-- Header of S3 screen -->
+                    <ObjectHeader id="Header" introPress="onAgentPress" introActive="true" title="{header>/SupplierName}" titlePress="onVendorPress" titleActive="true"
+              number="{path : 'header>/Value', formatter: '.formatMoney'}" numberUnit="{header>/Currency}">
+                        <firstStatus>
+                            <ObjectStatus id="ObjectHeaderStatusWiCreatedAt"
+                                text="{path: 'header>/WiCreatedAt', formatter: '.formatFechaUTC'}"></ObjectStatus>
+                        </firstStatus>
+                        <attributes>
+                            <ObjectAttribute id="ObjectHeaderAttributeCreatedByName" text="{header>/CreatedByName}" press="onNamePress" active="true"></ObjectAttribute>
+                            <ObjectAttribute id="ObjectHeaderAttributeForwardedBy"
+                                text="{parts:[{path : 'header>/ForwardedByName'}]}"
+                                press="onForwardedPress" active="true"></ObjectAttribute>
+                            <ObjectAttribute id="ObjectHeaderAttributeSubstitutedBy"
+                                text="{parts:[{path : 'header>/SubstitutingForName'}]}"
+                                press="onSubstitutingPress" active="true"></ObjectAttribute>
+                        </attributes>
+                        <!-- @ExtensionPoint extHeaderInfo: header information -->
+                        <core:ExtensionPoint name="extHeaderInfo"/>
+                    </ObjectHeader>
+
+                    <!-- Toggle Area of S3 screen -->
+                    <IconTabBar id="TabContainer" select="handleTabSelect">
+                        <items>
+                            <IconTabFilter id="IconTabBarFilterPCInformation" icon="sap-icon://hint" iconColor="Default" key="contentInfo">
+                                <!-- Contract Information of S3 screen -->
+                                <content>
+                                    <form:Form id="InfoForm" class="detailInfoForm">
+                                        <form:layout>
+                                            <form:ResponsiveLayout></form:ResponsiveLayout>
+                                        </form:layout>
+                                        <form:formContainers>
+                                            <form:FormContainer>
+                                                <form:layoutData>
+                                                    <layout:ResponsiveFlowLayoutData linebreak="true" margin="false"></layout:ResponsiveFlowLayoutData>
+                                                </form:layoutData>
+                                                <form:formElements>
+
+                                                    <form:FormElement id="PCInformationPCLabel">
+                                                        <form:layoutData>
+                                                            <layout:ResponsiveFlowLayoutData linebreak="true" margin="false"></layout:ResponsiveFlowLayoutData>
+                                                        </form:layoutData>
+                                                        <form:label>
+                                                            <Label text="{i18n>view.PurchaseContract.purchaseContractLabel}"></Label>
+                                                        </form:label>
+                                                        <form:fields>
+                                                            <Text text="{detail>/PoNumber}" textAlign="Initial">
+                                                                <layoutData>
+                                                                    <layout:ResponsiveFlowLayoutData weight="2"></layout:ResponsiveFlowLayoutData>
+                                                                </layoutData>
+                                                            </Text>
+                                                        </form:fields>
+                                                    </form:FormElement>
+                                                    
+                                                    <form:FormElement id="PCInformationContractType">
+                                                        <form:layoutData>
+                                                            <layout:ResponsiveFlowLayoutData linebreak="true" margin="false"></layout:ResponsiveFlowLayoutData>
+                                                        </form:layoutData>
+                                                        <form:label>
+                                                            <Label text="{i18n>view.PurchaseContract.contractTypeLabel}"></Label>
+                                                        </form:label>
+                                                        <form:fields>
+                                                            <Text
+                                                                text="{detail>/ContractTypeDescription'} ({detail>/ContractType})" textAlign="Initial">
+                                                                <layoutData>
+                                                                    <layout:ResponsiveFlowLayoutData weight="2"></layout:ResponsiveFlowLayoutData>
+                                                                </layoutData>
+                                                            </Text>
+                                                        </form:fields>
+                                                    </form:FormElement>
+                                                    <form:FormElement id="PCInformationAccountAssignment">
+                                                        <form:layoutData>
+                                                            <layout:ResponsiveFlowLayoutData linebreak="true" margin="false"></layout:ResponsiveFlowLayoutData>
+                                                        </form:layoutData>
+                                                        <form:label>
+                                                            <Label text="{i18n>view.PurchaseContract.accountAssignment}"></Label>
+                                                        </form:label>
+                                                        <form:fields>
+                                                            <VBox>
+                                                                <Text text="{detail>/HeaderInfo/AccountCategoryDescription} {detail>/HeaderInfo/AccountDescription} ({detail>/HeaderInfo/AccountNumber})"/>
+                                                                <Text text="Cuenta de mayor {detail>/HeaderInfo/GlAccountDescription} ({detail>/HeaderInfo/GlAccountNumber})"/>
+                                                                <layoutData>
+                                                                        <layout:ResponsiveFlowLayoutData weight="2"></layout:ResponsiveFlowLayoutData>
+                                                                </layoutData>
+                                                            </VBox>
+                                                        </form:fields>
+                                                    </form:FormElement>
+                                                    <form:FormElement id="PCInformationContractDate">
+                                                        <form:layoutData>
+                                                            <layout:ResponsiveFlowLayoutData linebreak="true" margin="false"></layout:ResponsiveFlowLayoutData>
+                                                        </form:layoutData>
+                                                        <form:label>
+                                                            <Label text="{i18n>view.PurchaseContract.dateLabel}"></Label>
+                                                        </form:label>
+                                                        <form:fields>
+                                                            <Text text="{path: 'detail>/ContractDate', formatter: '.formatFechaUTC'}" textAlign="Initial">
+                                                                <layoutData>
+                                                                    <layout:ResponsiveFlowLayoutData weight="2"></layout:ResponsiveFlowLayoutData>
+                                                                </layoutData>
+                                                            </Text>
+                                                        </form:fields>
+                                                    </form:FormElement>
+                                                    <!-- Validity -->
+                                                    <form:FormElement id="PCInformationValidity">
+                                                        <form:layoutData>
+                                                            <layout:ResponsiveFlowLayoutData linebreak="true" margin="false"></layout:ResponsiveFlowLayoutData>
+                                                        </form:layoutData>
+                                                        <form:label>
+                                                            <Label text="{i18n>view.PurchaseContract.validityLabel}"></Label>
+                                                        </form:label>
+                                                        <form:fields>
+                                                            <Text
+                                                                text="hasta {path: 'detail>/EndDate', formatter: '.formatFechaUTC'}" textAlign="Initial">
+                                                                <layoutData>
+                                                                    <layout:ResponsiveFlowLayoutData weight="2"></layout:ResponsiveFlowLayoutData>
+                                                                </layoutData>
+                                                            </Text>
+                                                        </form:fields>
+                                                    </form:FormElement>
+                                                    <form:FormElement id="PCInformationPlant">
+                                                        <form:layoutData>
+                                                            <layout:ResponsiveFlowLayoutData linebreak="true" margin="false"></layout:ResponsiveFlowLayoutData>
+                                                        </form:layoutData>
+                                                        <form:label>
+                                                            <Label text="{i18n>view.PurchaseContract.plantLabel}"></Label>
+                                                        </form:label>
+                                                        <form:fields>
+                                                            <Text text="{detail>/PlantName}" textAlign="Initial">
+                                                                <layoutData>
+                                                                    <layout:ResponsiveFlowLayoutData weight="2"></layout:ResponsiveFlowLayoutData>
+                                                                </layoutData>
+                                                            </Text>
+                                                        </form:fields>
+                                                    </form:FormElement>
+                                                    <form:FormElement id="PCInformationPaymentTerm">
+                                                        <form:layoutData>
+                                                            <layout:ResponsiveFlowLayoutData linebreak="true" margin="false"></layout:ResponsiveFlowLayoutData>
+                                                        </form:layoutData>
+                                                        <form:label>
+                                                            <Label text="{i18n>view.PurchaseContract.paymentTermsLabel}"></Label>
+                                                        </form:label>
+                                                        <form:fields>
+                                                            <Text text="{detail>/PaymentTermDescription}" textAlign="Initial">
+                                                                <layoutData>
+                                                                    <layout:ResponsiveFlowLayoutData weight="2"></layout:ResponsiveFlowLayoutData>
+                                                                </layoutData>
+                                                            </Text>
+                                                        </form:fields>
+                                                    </form:FormElement>
+                                                    <form:FormElement id="PCInformationCompany">
+                                                        <form:layoutData>
+                                                            <layout:ResponsiveFlowLayoutData linebreak="true" margin="false"></layout:ResponsiveFlowLayoutData>
+                                                        </form:layoutData>
+                                                        <form:label>
+                                                            <Label text="{i18n>view.PurchaseContract.companyCodeLabel}"></Label>
+                                                        </form:label>
+                                                        <form:fields>
+                                                            <Text
+                                                                text="{detail>/CompanyCodeDescription} ({detail>/CompanyCode})" textAlign="Initial">
+                                                                <layoutData>
+                                                                    <layout:ResponsiveFlowLayoutData weight="2"></layout:ResponsiveFlowLayoutData>
+                                                                </layoutData>
+                                                            </Text>
+                                                        </form:fields>
+                                                    </form:FormElement>
+                                                    <form:FormElement id="PCInformationPurchaseGroupDescription">
+                                                        <form:layoutData>
+                                                            <layout:ResponsiveFlowLayoutData linebreak="true" margin="false"></layout:ResponsiveFlowLayoutData>
+                                                        </form:layoutData>
+                                                        <form:label>
+                                                            <Label text="{i18n>view.PurchaseContract.purchasingGroupLabel}"></Label>
+                                                        </form:label>
+                                                        <form:fields>
+                                                            <Text
+                                                                text="{detail>/PurchGrpDescription} ({detail>/PurchGrp})" textAlign="Initial">
+                                                                <layoutData>
+                                                                    <layout:ResponsiveFlowLayoutData weight="2"></layout:ResponsiveFlowLayoutData>
+                                                                </layoutData>
+                                                            </Text>
+                                                        </form:fields>
+                                                    </form:FormElement>
+                                                    <form:FormElement id="PCInformationPurchaseOrgDescription">
+                                                        <form:layoutData>
+                                                            <layout:ResponsiveFlowLayoutData linebreak="true" margin="false"></layout:ResponsiveFlowLayoutData>
+                                                        </form:layoutData>
+                                                        <form:label>
+                                                            <Label text="{i18n>view.PurchaseContract.purchasingOrgLabel}"></Label>
+                                                        </form:label>
+                                                        <form:fields>
+                                                            <Text
+                                                                text="{detail>/PurchOrgDescription} ({detail>/PurchOrg})" textAlign="Initial">
+                                                                <layoutData>
+                                                                    <layout:ResponsiveFlowLayoutData weight="2"></layout:ResponsiveFlowLayoutData>
+                                                                </layoutData>
+                                                            </Text>
+                                                        </form:fields>
+                                                    </form:FormElement>
+                                                    <!-- @ExtensionPoint extInformation: Do not use this extension point. It has a duplicate name. Use extInformationS3 instead. -->
+                                                    <core:ExtensionPoint name="extInformation"/>
+                                                    <!-- @ExtensionPoint extInformationS3: information area -->
+                                                    <core:ExtensionPoint name="extInformationS3"/>
+                                                </form:formElements>
+                                            </form:FormContainer>
+                                        </form:formContainers>
+                                    </form:Form>
+                                </content>
+                            </IconTabFilter>
+
+                            <IconTabFilter id="IconTabBarFilterPOApprovers" icon="sap-icon://account">
+                            <content>
+                                    <Table id="idProductsTable"
+                                        inset="false"
+                                        items="{
+                                            path: 'aprobadores>/'
+                                        }">
+                                        
+                                        <columns>
+                                            <Column
+                                                width="5em">
+                                                <Text text="Orden" />
+                                            </Column>
+                                            <Column>
+                                                <Text text="Nombre" />
+                                            </Column>
+                                            <Column>
+                                                <Text text="Usuario SAP" />
+                                            </Column>
+                                            <Column>
+                                                <Text text="Aprobado" />
+                                            </Column>
+                                        </columns>
+                                        <items>
+                                            <ColumnListItem>
+                                                <cells>
+                                                    <ObjectStatus
+                                                        text="{aprobadores>Secuencia}" state="{path:'aprobadores>Aprobado'}" />
+                                                    <ObjectStatus
+                                                        text="{aprobadores>Nombre}" state="{path:'aprobadores>Aprobado'}"/>
+                                                    <ObjectStatus
+                                                        text="{aprobadores>IdSap}" state="{path:'aprobadores>Aprobado'}"/>
+                                                    <ObjectStatus
+                                                        text="{aprobadores>Aprobado}" state="Success"/>
+                                                </cells>
+                                            </ColumnListItem>
+                                        </items>
+                                    </Table>
+                            </content>
+                            
+                        </IconTabFilter>
+
+                        </items>
+                    </IconTabBar>
+
+
+
+                    <!--<layout:VerticalLayout width="100%"> -->
+                    <!-- Item table on S3 screen -->
+                    <Table id="itemsTable" items="{detail>/ItemDetails/results}" noDataText="{i18n>view.PurchaseContract.placeholder}" class="detailControlPadding"
+                        growing="true" growingScrollToLoad="false"
+                        headerText="{i18n>view.PurchaseContract.multipleItems} ({path : 'detail>/NumberOfItems'})">
+                        <columns>
+                            <Column hAlign="Begin" id="ItemsTableColumnDescription">
+                                <header>
+                                    <Label text="{i18n>view.PurchaseContract.descriptionLabel}"></Label>
+                                </header>
+                            </Column>
+                            <Column hAlign="Begin" id="ItemsTableColumnItemCategory" demandPopin="true" minScreenWidth="Medium">
+                                <header>
+                                    <Label text="{i18n>view.PurchaseContract.itemCategory}"></Label>
+                                </header>
+                            </Column>
+                            <Column id="ItemsTableColumnQuantity" hAlign="End" demandPopin="true" minScreenWidth="Medium">
+                                <header>
+                                    <Label text="{i18n>view.PurchaseContract.quantity}"></Label>
+                                </header>
+                            </Column>
+                            <Column id="ItemsTableColumnSubtotal" hAlign="End" demandPopin="true" minScreenWidth="Medium">
+                                <header>
+                                    <Label text="{i18n>view.PurchaseContract.subtotal}"></Label>
+                                </header>
+                            </Column>
+                        </columns>
+
+                        <items>
+                            <ColumnListItem type="Navigation" press="onLineItemPress">
+                                <cells>
+                                    <ObjectIdentifier title="{detail>Description}"></ObjectIdentifier>
+                                    <Text
+                                        text="{path : 'detail>ItemCategoryDescription'}"></Text>
+                                    <ObjectNumber number="{path: 'detail>Quantity'}"
+                                        numberUnit="{detail>UnitDescription}"></ObjectNumber>
+                                    <ObjectNumber number="{path: 'detail>Value'}"
+                                        numberUnit="{detail>Currency}"></ObjectNumber>
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </content>
+                <!-- </layout:VerticalLayout> -->
+                <footer>
+                    <Bar id="detailFooter"></Bar>
+                </footer>
+            </Page>
+        </detailPages>
+    </SplitApp>
+</mvc:View>

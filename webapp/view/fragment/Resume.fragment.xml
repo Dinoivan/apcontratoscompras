@@ -1,0 +1,33 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<Dialog title="Resumen de ejecución">
+		<l:VerticalLayout class="sapUiContentPadding" width="100%">
+			<l:content>
+				<Table id="idProductsTable" inset="false" items="{ path: 'detalleEjecucion>/' }">
+					<columns>
+						<Column >
+							<Text text="Número"/>
+						</Column>
+						<Column>
+							<Text text="Mensaje"/>
+						</Column>
+						<Column >
+							<Text text="Tipo"/>
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Text text="{detalleEjecucion>Ebeln}"/>
+								<Text text="{detalleEjecucion>Msg}"/>
+								<Text text="{detalleEjecucion>Type}"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</l:content>
+		</l:VerticalLayout>
+		<beginButton>
+			<Button text="Cerrar" press="onCloseFilterOptionsDialogConfirm"/>
+		</beginButton>
+	</Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,61 @@
+{
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/resources/(.*)$",
+      "target": "/resources/$1",
+      "authenticationType": "none",
+      "destination": "ui5"
+    },
+
+    {
+      "source": "^/sap/opu/odata/(.*)$",
+      "target": "/sap/opu/odata/$1",
+      "destination": "ODATA_FIORI_GATEWAY_CLONING",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/coga/sap/bc/srt/rfc(.*)$",
+      "target": "/coga/sap/bc/srt/rfc/$1",
+      "destination": "ODATA_FIORI_GATEWAY_CLONING",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+
+    {
+      "source": "^/ODATA_FIORI_GATEWAY/(.*)$",
+      "target": "$1",
+      "destination": "ODATA_FIORI_GATEWAY_CLONING",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/user-api(.*)",
+      "target": "$1",
+      "service": "sap-approuter-userapi"
+     },
+
+    {
+      "authenticationType": "none",
+      "csrfProtection": false,
+      "source": "^/IdentityProviderDestination/(.*)$",
+      "destination": "IdentityProviderDestination",
+      "target": "$1"
+    },
+   
+    {
+      "source": "^/test-resources/(.*)$",
+      "target": "/test-resources/$1",
+      "authenticationType": "none",
+      "destination": "ui5"
+    },
+    {
+      "source": "^(.*)$",
+      "target": "$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa"
+    }
+  ]
+}
