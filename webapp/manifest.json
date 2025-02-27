@@ -7,7 +7,8 @@
     "applicationVersion": {
       "version": "0.0.1"
     },
-    "title": "{{appTitle}}",
+    "title": "Aprobación de Contratos",
+    "subTitle": "Contratos",
     "description": "{{appDescription}}",
     "resources": "resources.json",
     "sourceTemplate": {
@@ -25,12 +26,35 @@
           "odataVersion": "2.0"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "dynamicTile": {
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          },
+          "semanticObject": "AprobacionContratos",
+          "action": "display",
+         "title": "Aprobación de\u000AContratos",
+          "subTitle": "Contratos",
+          "info": "Pendientes",
+          "icon": "sap-icon://task",
+          "indicatorDataSource": {
+            "dataSource": "mainService",
+            "path": "/fdeea09a-ab31-41e1-b3d2-dddf57b8978a.apcontratoscompras.apcontratoscompras/~c62d5f61-2d69-4a1c-959b-8078f01542c8~/sap/opu/odata/sap/SRA001_PCAPPROVAL;mo/WorkflowTaskCollection/$count",
+            "refresh": 5
+          }
+        }
+      }
     }
+
   },
+  
   "sap.ui": {
     "technology": "UI5",
     "icons": {
-      "icon": "",
+      "icon": "sap-icon://document-text",
       "favIcon": "",
       "phone": "",
       "phone@2": "",

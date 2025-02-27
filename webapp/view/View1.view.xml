@@ -1,7 +1,7 @@
 <mvc:View controllerName="apcontratoscompras.controller.View1" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:form="sap.ui.layout.form" xmlns:f="sap.ui.layout.form" xmlns:layout="sap.ui.layout">
     <SplitApp id="SplitApp">
         <masterPages>
-            <Page id="page" title="{i18n>view.Master.title} {= ${path: '/WorkflowTaskCollection'}.length}">
+            <Page id="page" title="{i18n>view.Master.title} ({= ${path: '/WorkflowTaskCollection>/results'}.length})">
                 <content>
                     <List id="list" mode="MultiSelect"
                         includeItemInSelection="false"
@@ -128,13 +128,21 @@
                                                             <Label text="{i18n>view.PurchaseContract.accountAssignment}"></Label>
                                                         </form:label>
                                                         <form:fields>
-                                                            <VBox>
-                                                                <Text text="{detail>/HeaderInfo/AccountCategoryDescription} {detail>/HeaderInfo/AccountDescription} ({detail>/HeaderInfo/AccountNumber})"/>
-                                                                <Text text="Cuenta de mayor {detail>/HeaderInfo/GlAccountDescription} ({detail>/HeaderInfo/GlAccountNumber})"/>
-                                                                <layoutData>
-                                                                        <layout:ResponsiveFlowLayoutData weight="2"></layout:ResponsiveFlowLayoutData>
-                                                                </layoutData>
-                                                            </VBox>
+                                                           <VBox>
+                                                            <Text text="{
+                                                                parts: [
+                                                                    {path: 'detail>/HeaderInfo/AccountCategoryDescription'},
+                                                                    {path: 'detail>/HeaderInfo/AccountDescription'},
+                                                                    {path: 'detail>/HeaderInfo/AccountNumber'},
+                                                                    {path: 'detail>/HeaderInfo/GlAccountDescription'},
+                                                                    {path: 'detail>/HeaderInfo/GlAccountNumber'}
+                                                                ],
+                                                                formatter: '.formatCostAssignment'
+                                                            }"/>
+                                                            <layoutData>
+                                                                <layout:ResponsiveFlowLayoutData weight="2"/>
+                                                            </layoutData>
+                                                        </VBox>
                                                         </form:fields>
                                                     </form:FormElement>
                                                     <form:FormElement id="PCInformationContractDate">
@@ -258,12 +266,34 @@
                                 </content>
                             </IconTabFilter>
 
+                               <IconTabFilter id="IconTabBarFilterPRNotes" key="Notes" count="{detail>/NumberOfNotes}"
+                            visible="{path : 'detail>/NumberOfNotes', formatter: '.notesVisibilityTrigger'}"
+                            icon="sap-icon://notes">
+                              <List id="listNotes" showSeparators="None" inset="true" items="{path : 'detail>/Notes/results'}">
+                                <FeedListItem id="NoteTemplate"
+                                    icon="{detail>Thumbnail}"
+                                    senderPress="onNoteSenderPress" text="{detail>Text}" info="{detail>TypeDescription}"></FeedListItem>
+                              </List>
+                           </IconTabFilter>
+
+                            <IconTabFilter id="IconTabBarFilterPRAttachments" key="Attachments" count="{detail>/NumberOfAttachments}"
+                                            visible="{path : 'detail>/Attachments/results', formatter: '.attachmentsVisibilityTrigger'}"
+                                            icon="sap-icon://attachment">
+                                    <List id="listAttachments" showSeparators="None" inset="true" items="{path : 'detail>/Attachments/results'}">
+                                        <StandardListItem title="{detail>Description}" 
+                                                        description="{= Math.round(${detail>FileSize} / 1024) + ' KB'}"
+                                                        icon="sap-icon://pdf-attachment"
+                                                        type="Navigation"
+                                                        press="onAttachmentPress"/>
+                                    </List>
+                            </IconTabFilter>
+
                             <IconTabFilter id="IconTabBarFilterPOApprovers" icon="sap-icon://account">
                             <content>
-                                    <Table id="idProductsTable"
+                                    <Table id="idProductsTablee"
                                         inset="false"
                                         items="{
-                                            path: 'aprobadores>/'
+                                            path: 'aprobadores>/items'
                                         }">
                                         
                                         <columns>
@@ -285,11 +315,11 @@
                                             <ColumnListItem>
                                                 <cells>
                                                     <ObjectStatus
-                                                        text="{aprobadores>Secuencia}" state="{path:'aprobadores>Aprobado'}" />
+                                                        text="{aprobadores>Secuencia}"  state="{path:'aprobadores>Aprobado', formatter: '.formatAprobadoState'}" />
                                                     <ObjectStatus
-                                                        text="{aprobadores>Nombre}" state="{path:'aprobadores>Aprobado'}"/>
+                                                        text="{aprobadores>Nombre}"  state="{path:'aprobadores>Aprobado', formatter: '.formatAprobadoState'}"/>
                                                     <ObjectStatus
-                                                        text="{aprobadores>IdSap}" state="{path:'aprobadores>Aprobado'}"/>
+                                                        text="{aprobadores>IdSap}"  state="{path:'aprobadores>Aprobado', formatter: '.formatAprobadoState'}"/>
                                                     <ObjectStatus
                                                         text="{aprobadores>Aprobado}" state="Success"/>
                                                 </cells>
@@ -353,6 +383,210 @@
                     <Bar id="detailFooter"></Bar>
                 </footer>
             </Page>
+
+            <Page id="idItemDetailPage">
+                    <customHeader>
+                        <Toolbar>
+                            <Button icon="sap-icon://arrow-left" press="onBackPress" type="Transparent" tooltip="Volver" />
+                            <Title text="Posición {detalle>/ItemNumberFormatted} de {detalle>/NumberOfItems}" level="H4" />
+                        </Toolbar>
+                    </customHeader>
+
+                    <VBox>
+                        <!-- Cabecera -->
+                        <Panel>
+                            <content>
+                                <HBox justifyContent="SpaceBetween" alignItems="Center" width="100%">
+                                    <VBox width="60%">
+                                        <Title text="{detalle>/Description}" level="H3"/>
+                                        <Text text="{detalle>/ItemCategoryDescription}" />
+                                    </VBox>
+                                    <VBox alignItems="End" width="40%">
+                                        <Text text="{detalle>/Value}" class="sapMTextLarge sapMTextBold"/>
+                                        <Text text="{detalle>/Currency}" class="sapMTextSmall"/>
+                                    </VBox>
+                                </HBox>
+                            </content>
+                        </Panel>
+
+                        <!-- Información (Centrado) -->
+                        <Panel headerText="Información">
+                            <content>
+                                <VBox alignItems="Center">
+                                    <HBox justifyContent="Center">
+                                        <!-- Primera columna (etiquetas) -->
+                                        <VBox class="sapUiSmallMarginEnd">
+                                            <Label text="Grupo de materiales:" />
+                                            <Label text="Centro:" />
+                                            <Label text="Dirección:" />
+                                        </VBox>
+
+                                        <!-- Segunda columna (valores) -->
+                                        <VBox>
+                                            <Text text="{= ${detalle>/ProductDetails/MaterialGroupDescription} + ' (' + ${detalle>/ProductDetails/MaterialGroup} + ')' }"/>
+                                            <Text text="{detalle>/DeliveryAddress/PlantName}"  textAlign="Begin"/>
+                                            <Text text="{detalle>/DeliveryAddress/AddressString}" textAlign="Begin" />
+                                        </VBox>
+                                    </HBox>
+                                </VBox>
+                            </content>
+                        </Panel>
+
+                        <!-- Líneas de servicio -->
+                        <Panel headerText="Líneas de servicio ({= ${detalle>/ServiceLines/results}.length})" visible="{= ${detalle>/ServiceLines/results}.length > 0}" >
+                            <content>
+                                <Table items="{detalle>/ServiceLines/results}">
+                                    <columns>
+                                        <Column>
+                                            <Text text="Descripción" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="Cantidad" />
+                                        </Column>
+                                        <Column hAlign="Right">
+                                            <Text text="Subtotal" />
+                                        </Column>
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem type="Navigation" press="onServiceLinePress">
+                                            <cells>
+                                                <Text text="{detalle>Description}" class="sapMTextBold"/>
+                                                <Text text="{detalle>Quantity} {detalle>UnitDescription}" />
+                                                <Text text="{detalle>Value} {detalle>Currency}" textAlign="Right" />
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </content>
+                        </Panel>
+
+                        <Panel headerText="Notas" visible="{= ${detalle>/Notes/results}.length > 0}" >
+                            <content>
+                               
+                              <List id="listNotess" showSeparators="None" inset="true" items="{path : 'detalle>/Notes/results'}">
+                                <FeedListItem id="NoteTemplatee"
+                                    icon="{detalle>Thumbnail}"
+                                    senderPress="onNoteSenderPress" text="{detalle>Text}" info="{detalle>TypeDescription}"></FeedListItem>
+                              </List>
+                          
+                            </content>
+                        </Panel>
+
+                        <!-- Condiciones de Precio (Inicio y final) -->
+                        <Panel headerText="Condiciones de precio">
+                            <content>
+                                <Table items="{detalle>/PricingConditions/results}">
+                                    <columns>
+                                        <Column>
+                                            <Text text="Descripción" />
+                                        </Column>
+                                        <Column hAlign="Right">
+                                            <Text text="Precio" />
+                                        </Column>
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <Text text="{detalle>Description} {detalle>PricingConditionType}" class="sapMTextBold"/>
+                                                <Text text="{detalle>Value} {detalle>Currency}" textAlign="Right" />
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </content>
+                        </Panel>
+                    </VBox>
+                </Page>
+
+                 <Page id="idService" title="Detalle del servicio" >
+                <customHeader>
+                    <Toolbar>
+                        <!-- Botón de retroceso -->
+                        <Button 
+                            icon="sap-icon://arrow-left" 
+                            press="onBackPressService" 
+                            type="Transparent" 
+                            tooltip="Volver" />
+
+                            <!-- Texto dinámico de la posición -->
+                        <Title text="Línea de servicio {service>ItemNumberFormatted/} de {service>/NumberServiceLine} - Posición {service>/ItemNumberFormatted} de {service>/NumberOfItems}" level="H3"/>
+                    </Toolbar>
+                </customHeader>
+             <content>
+            <VBox class="sapUiSmallMargin">
+                <!-- Título -->
+                <HBox justifyContent="SpaceBetween" alignItems="Center">
+                  <VBox class="sapUiSmallMargin">
+                     <Title text="{service>/ServiceLines/results/0/Description}" class="sapMTextLarge sapMTextBold"/>
+                  </VBox>
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Text text="{service>/ServiceLines/results/0/Value}" class="sapMTextLarge sapMTextBold"/>
+                        <Text text="{service>/ServiceLines/results/0/Currency}" class="sapMTextSmall"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Detalles del servicio -->
+                <VBox class="sapUiSmallMargin">
+                    <Text text="{service>/ServiceLines/results/0/Quantity} {service>/ServiceLines/results/0/UnitDescription}" />
+                    <Text text="{service>/ServiceLines/results/0/PricePerUnit} {service>/ServiceLines/results/0/Currency} / {service>/ServiceLines/results/0/Quantity} {service>/ServiceLines/results/0/UnitDescription}"/>
+                </VBox>
+
+               <!-- Información (Centrado) -->
+                        <Panel headerText="Información">
+                            <content>
+                                <VBox alignItems="Center">
+                                    <HBox justifyContent="Center">
+                                        <!-- Primera columna (etiquetas) -->
+                                        <VBox class="sapUiSmallMarginEnd">
+                                            <Label text="Servicio:" />
+                                            <Label text="Descripción:" />
+                                          
+                                        </VBox>
+
+                                        <!-- Segunda columna (valores) -->
+                                        <VBox>
+                                            <Text text="{= ${detalle>/ProductDetails/MaterialGroupDescription} + ' (' + ${detalle>/ProductDetails/MaterialGroup} + ')' }"/>
+                                            <Text text="{detalle>/DeliveryAddress/PlantName}"  textAlign="Begin"/>
+                                       
+                                        </VBox>
+                                    </HBox>
+                                </VBox>
+                            </content>
+                        </Panel>
+
+                <!-- Sección de Asignación de Costes -->
+                <Panel headerText="Asignación de costes">
+                    <Table id="costAssignmentTable" inset="false" items="{service>/ServiceLines/results/0/Accountings/results}">
+                        <columns >
+                            <Column>
+                                <Text text="Objetos"/>
+                            </Column>
+                            <Column>
+                                <Text text="Cuenta mayor"/>
+                            </Column>
+                            <Column hAlign="Right">
+                                <Text text="Compartir"/>
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <VBox>
+                                        <Text text="{service>AccountDescription} ({service>AccountNumber})" class="sapMTextBold"/>
+                                        <Text text="{service>AccountCategoryDescription}"/>
+                                    </VBox>
+                                    <Text text="{service>GlAccountDescription} ({service>GlAccountNumber})"/>
+                                    <Text text="{service>DistributionPercentage} %" textAlign="Right" />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </Panel>
+            </VBox>
+           </content>
+
+            </Page>
+
         </detailPages>
     </SplitApp>
 </mvc:View>
